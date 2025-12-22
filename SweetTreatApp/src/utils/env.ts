@@ -14,3 +14,4 @@ if (!ENV.SUPABASE_URL || !ENV.SUPABASE_ANON_KEY) {
     '⚠️ Missing Supabase environment variables. Please set them in app.json under "extra".'
   )
 }
+
