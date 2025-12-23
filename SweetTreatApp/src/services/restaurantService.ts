@@ -5,7 +5,7 @@ export const restaurantService = {
   /**
    * Get all restaurants
    */
-  async getAll(): Promise<Restaurant[] | null> {
+  async getAll() {
     const { data, error } = await supabase
       .from('restaurants')
       .select('*')
@@ -18,7 +18,7 @@ export const restaurantService = {
   /**
    * Get restaurant by ID
    */
-  async getById(id: string): Promise<Restaurant | null> {
+  async getById(id: string) {
     const { data, error } = await supabase
       .from('restaurants')
       .select('*')
@@ -32,7 +32,7 @@ export const restaurantService = {
   /**
    * Get restaurants near a location
    */
-  async getNearby(latitude: number, longitude: number, radiusKm: number = 5): Promise<Restaurant[] | null> {
+  async getNearby(latitude: number, longitude: number, radiusKm: number = 5) {
     // Using PostGIS function st_dwithin (requires PostGIS extension in Supabase)
     // For MVP, we'll use a simple bounding box approach
     const latDelta = radiusKm / 111 // roughly 1 degree = 111km
@@ -53,7 +53,7 @@ export const restaurantService = {
   /**
    * Search restaurants by name
    */
-  async search(query: string): Promise<Restaurant[] | null> {
+  async search(query: string) {
     const { data, error } = await supabase
       .from('restaurants')
       .select('*')
@@ -66,7 +66,7 @@ export const restaurantService = {
   /**
    * Filter restaurants by cuisine type
    */
-  async getByCuisine(cuisineType: string): Promise<Restaurant[] | null> {
+  async getByCuisine(cuisineType: string) {
     const { data, error } = await supabase
       .from('restaurants')
       .select('*')
@@ -79,7 +79,7 @@ export const restaurantService = {
   /**
    * Create a new restaurant
    */
-  async create(restaurant: RestaurantInsert): Promise<Restaurant> {
+  async create(restaurant: RestaurantInsert) {
     const { data, error } = await supabase
       .from('restaurants')
       .insert(restaurant)
@@ -93,7 +93,7 @@ export const restaurantService = {
   /**
    * Update a restaurant
    */
-  async update(id: string, updates: RestaurantUpdate): Promise<Restaurant> {
+  async update(id: string, updates: RestaurantUpdate) {
     const { data, error } = await supabase
       .from('restaurants')
       .update(updates)
@@ -108,7 +108,7 @@ export const restaurantService = {
   /**
    * Delete a restaurant
    */
-  async delete(id: string): Promise<void> {
+  async delete(id: string) {
     const { data, error } = await supabase
       .from('restaurants')
       .delete()
