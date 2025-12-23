@@ -1,12 +1,31 @@
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { useState } from 'react';
 
 import { HelloWave } from '@/components/hello-wave';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
+import { testSupabaseConnection } from '@/src/utils/testSupabaseConnection';
 
 export default function HomeScreen() {
+  const [testing, setTesting] = useState(false);
+
+  const handleTestConnection = async () => {
+    setTesting(true);
+    try {
+      const result = await testSupabaseConnection();
+      Alert.alert(
+        result.success ? '✅ Connection Successful!' : '❌ Connection Failed',
+        result.message,
+        [{ text: 'OK' }]
+      );
+    } catch (error: any) {
+      Alert.alert('❌ Error', error.message || 'Failed to test connection');
+    } finally {
+      setTesting(false);
+    }
+  };
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: 'pink', dark: 'pink' }}
@@ -60,7 +79,21 @@ export default function HomeScreen() {
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
+        <ThemedText type="subtitle">Step 3: Test Supabase Connection</ThemedText>
+        <ThemedText>
+          Test your Supabase connection to make sure your API keys are configured correctly.
+        </ThemedText>
+        <TouchableOpacity
+          style={[styles.button, testing && styles.buttonDisabled]}
+          onPress={handleTestConnection}
+          disabled={testing}>
+          <ThemedText style={styles.buttonText}>
+            {testing ? 'Testing...' : 'Test Supabase Connection'}
+          </ThemedText>
+        </TouchableOpacity>
+      </ThemedView>
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Step 4: Get a fresh start</ThemedText>
         <ThemedText>
           {`When you're ready, run `}
           <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
@@ -82,5 +115,19 @@ const styles = StyleSheet.create({
   stepContainer: {
     gap: 8,
     marginBottom: 8,
+  },
+  button: {
+    backgroundColor: '#007AFF',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 8,
+    alignItems: 'center',
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
 });
