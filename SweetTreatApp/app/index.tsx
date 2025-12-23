@@ -1,12 +1,23 @@
-import { StyleSheet, Text, View } from "react-native";
+import React from 'react';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { router } from 'expo-router';
 
-export default function Page() {
+export default function LoginScreen() {
   return (
     <View style={styles.container}>
-      <View style={styles.main}>
-        <Text style={styles.title}>Hello World</Text>
-        <Text style={styles.subtitle}>This is the first page of your app.</Text>
-      </View>
+      <TouchableOpacity 
+        style={styles.button}
+        onPress={() => router.push('/(tabs)/home')}
+      >
+        <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={styles.button}
+        onPress={() => console.log('Sign Up pressed')}
+      >
+        <Text style={styles.buttonText}>Sign Up</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -14,21 +25,20 @@ export default function Page() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    padding: 24,
+    backgroundColor: 'pink',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 20,
   },
-  main: {
-    flex: 1,
-    justifyContent: "center",
-    maxWidth: 960,
-    marginHorizontal: "auto",
+  button: {
+    backgroundColor: '#fff',
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 8,
   },
-  title: {
-    fontSize: 64,
-    fontWeight: "bold",
-  },
-  subtitle: {
-    fontSize: 36,
-    color: "#38434D",
+  buttonText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
