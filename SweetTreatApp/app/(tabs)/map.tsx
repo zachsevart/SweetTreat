@@ -6,8 +6,8 @@ export default function MapScreen() {
   const [marker, setMarker] = useState<LatLng | null>(null);
 
   const initialRegion = {
-    latitude: 37.78825,
-    longitude: -122.4324,
+    latitude: 47.6061,
+    longitude: -122.3328,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   };
@@ -19,6 +19,7 @@ export default function MapScreen() {
   return (
     <View style={styles.container}>
       <MapView
+
         style={styles.map}
         initialRegion={initialRegion}
         showsUserLocation
