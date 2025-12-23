@@ -9,7 +9,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyDHcvBZ0a0i0DGSwUDIfOtupM92S5Pmhas"
+      },
+      "bundleIdentifier": "com.anonymous.SweetTreatApp"
     },
     "android": {
       "adaptiveIcon": {
