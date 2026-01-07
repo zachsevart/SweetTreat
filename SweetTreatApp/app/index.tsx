@@ -1,24 +1,44 @@
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { router } from 'expo-router';
+import React, { useEffect } from 'react';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { router, useSegments } from 'expo-router';
+import { useUser } from '@/src/contexts/UserContext';
+import { ThemedView } from '@/components/themed-view';
 
-export default function LoginScreen() {
+export default function IndexScreen() {
+  const { session, profile, loading, isNewUser } = useUser();
+  const segments = useSegments();
+
+  useEffect(() => {
+    if (loading) return;
+
+    const inAuthGroup = segments[0] === 'auth';
+
+    if (!session) {
+      // Not signed in, redirect to login
+      if (!inAuthGroup) {
+        router.replace('/auth/login');
+      }
+    } else if (session) {
+      // Signed in
+      if (isNewUser || !profile) {
+        // New user or no profile, redirect to profile creation
+        if (!inAuthGroup) {
+          router.replace('/auth/create-profile');
+        }
+      } else {
+        // Has profile, redirect to home
+        if (inAuthGroup) {
+          router.replace('/(tabs)/home');
+        }
+      }
+    }
+  }, [session, profile, loading, isNewUser, segments]);
+
+  // Show loading screen while checking auth state
   return (
-    <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.button}
-        onPress={() => router.push('/(tabs)/home')}
-      >
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity 
-        style={styles.button}
-        onPress={() => console.log('Sign Up pressed')}
-      >
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
-    </View>
+    <ThemedView style={styles.container}>
+      <ActivityIndicator size="large" color="#fff" />
+    </ThemedView>
   );
 }
 
@@ -28,17 +48,5 @@ const styles = StyleSheet.create({
     backgroundColor: 'pink',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 20,
-  },
-  button: {
-    backgroundColor: '#fff',
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: '#000',
-    fontSize: 16,
-    fontWeight: '600',
   },
 });

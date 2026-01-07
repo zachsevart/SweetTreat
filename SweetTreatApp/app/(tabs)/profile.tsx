@@ -1,25 +1,61 @@
+import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native';
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 
 import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Fonts } from '@/constants/theme';
+import { useUser } from '@/src/contexts/UserContext';
 
-export default function TabTwoScreen() {
+export default function ProfileScreen() {
+  const { user, profile, signOut } = useUser();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Sign Out',
+        style: 'destructive',
+        onPress: async () => {
+          await signOut();
+          router.replace('/auth/login');
+        },
+      },
+    ]);
+  };
+
+  const displayName = profile?.username || user?.email?.split('@')[0] || 'User';
+  const email = user?.email || '';
+  const avatarUrl = profile?.avatar_url;
+  const accountCreated = profile?.created_at
+    ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    : 'N/A';
+
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
+      headerBackgroundColor={{ light: 'pink', dark: 'pink' }}
       headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
+        <View style={styles.headerImageContainer}>
+          <View style={styles.avatarContainer}>
+            {avatarUrl ? (
+              <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
+            ) : (
+              <ThemedText
+                type="title"
+                style={[
+                  styles.avatarText,
+                  {
+                    fontFamily: Fonts.rounded,
+                  },
+                ]}>
+                👤
+              </ThemedText>
+            )}
+          </View>
+        </View>
       }>
       <ThemedView style={styles.titleContainer}>
         <ThemedText
@@ -27,86 +63,151 @@ export default function TabTwoScreen() {
           style={{
             fontFamily: Fonts.rounded,
           }}>
-          Explore
+          Profile
         </ThemedText>
       </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
+
+      <ThemedView style={styles.profileSection}>
+        <ThemedText type="subtitle">{displayName}</ThemedText>
+        <ThemedText style={styles.email}>{email}</ThemedText>
+      </ThemedView>
+
+      <ThemedView style={styles.statsContainer}>
+        <ThemedView style={styles.statItem}>
+          <ThemedText type="subtitle" style={styles.statNumber}>
+            24
+          </ThemedText>
+          <ThemedText style={styles.statLabel}>Favorites</ThemedText>
+        </ThemedView>
+        <ThemedView style={styles.statItem}>
+          <ThemedText type="subtitle" style={styles.statNumber}>
+            12
+          </ThemedText>
+          <ThemedText style={styles.statLabel}>Reviews</ThemedText>
+        </ThemedView>
+        <ThemedView style={styles.statItem}>
+          <ThemedText type="subtitle" style={styles.statNumber}>
+            8
+          </ThemedText>
+          <ThemedText style={styles.statLabel}>Visited</ThemedText>
+        </ThemedView>
+      </ThemedView>
+
+      <Collapsible title="Preferences">
+        <ThemedView style={styles.preferenceItem}>
+          <ThemedText>
+            <ThemedText type="defaultSemiBold">Dietary Restrictions:</ThemedText> None
+          </ThemedText>
+        </ThemedView>
+        <ThemedView style={styles.preferenceItem}>
+          <ThemedText>
+            <ThemedText type="defaultSemiBold">Favorite Cuisine:</ThemedText> Desserts & Pastries
+          </ThemedText>
+        </ThemedView>
+        <ThemedView style={styles.preferenceItem}>
+          <ThemedText>
+            <ThemedText type="defaultSemiBold">Notification Settings:</ThemedText> Enabled
+          </ThemedText>
+        </ThemedView>
       </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
+
+      <Collapsible title="Account Settings">
+        <ThemedView style={styles.settingItem}>
+          <ThemedText>
+            <ThemedText type="defaultSemiBold">Account Created:</ThemedText> {accountCreated}
+          </ThemedText>
+        </ThemedView>
+        {profile?.bio && (
+          <ThemedView style={styles.settingItem}>
             <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
+              <ThemedText type="defaultSemiBold">Bio:</ThemedText> {profile.bio}
             </ThemedText>
-          ),
-        })}
+          </ThemedView>
+        )}
+        <ThemedView style={styles.settingItem}>
+          <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
+            <ThemedText style={styles.signOutText}>Sign Out</ThemedText>
+          </TouchableOpacity>
+        </ThemedView>
       </Collapsible>
     </ParallaxScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  headerImageContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 4,
+    borderColor: 'rgba(255, 255, 255, 0.5)',
+  },
+  avatarText: {
+    fontSize: 60,
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 56,
   },
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
+    marginBottom: 16,
+  },
+  profileSection: {
+    gap: 4,
+    marginBottom: 24,
+  },
+  email: {
+    opacity: 0.7,
+    fontSize: 14,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 24,
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderTopColor: 'rgba(128, 128, 128, 0.2)',
+    borderBottomColor: 'rgba(128, 128, 128, 0.2)',
+  },
+  statItem: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  statNumber: {
+    fontSize: 24,
+  },
+  statLabel: {
+    fontSize: 12,
+    opacity: 0.7,
+  },
+  preferenceItem: {
+    marginBottom: 12,
+  },
+  settingItem: {
+    marginBottom: 12,
+  },
+  signOutButton: {
+    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  signOutText: {
+    color: '#ff4444',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
