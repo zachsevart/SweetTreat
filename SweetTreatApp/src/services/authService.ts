@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { Session, User } from '@supabase/supabase-js'
+import { Profile } from '../types'
 
 export const authService = {
   /**
@@ -16,6 +17,56 @@ export const authService = {
   async getCurrentUser(): Promise<User | null> {
     const { data: { user } } = await supabase.auth.getUser()
     return user
+  },
+
+  /**
+   * Get user profile
+   */
+  async getProfile(userId: string): Promise<Profile | null> {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single()
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // Profile doesn't exist
+        return null
+      }
+      throw error
+    }
+
+    return data
+  },
+
+  /**
+   * Create user profile
+   */
+  async createProfile(profile: { id: string; username?: string; avatar_url?: string; bio?: string }) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .insert(profile)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  },
+
+  /**
+   * Update user profile
+   */
+  async updateProfile(userId: string, updates: Partial<Profile>) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', userId)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
   },
 
   /**
