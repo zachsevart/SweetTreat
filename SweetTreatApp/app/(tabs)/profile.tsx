@@ -1,6 +1,7 @@
 import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 
 import { Collapsible } from '@/components/ui/collapsible';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
@@ -12,6 +13,11 @@ import { useUser } from '@/src/contexts/UserContext';
 export default function ProfileScreen() {
   const { user, profile, signOut } = useUser();
   const router = useRouter();
+
+  const handleEditProfile = () => {
+
+    router.push('/profile/edit-profile');
+  };
 
   const handleSignOut = async () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -58,6 +64,9 @@ export default function ProfileScreen() {
         </View>
       }>
       <ThemedView style={styles.titleContainer}>
+        <TouchableOpacity onPress={handleEditProfile}>
+          <IconSymbol name="pencil" size={24} color="black" />
+        </TouchableOpacity>
         <ThemedText
           type="title"
           style={{
@@ -209,5 +218,10 @@ const styles = StyleSheet.create({
     color: '#ff4444',
     fontSize: 16,
     fontWeight: '600',
+  },
+  editProfileButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
   },
 });
