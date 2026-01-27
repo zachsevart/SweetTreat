@@ -21,6 +21,7 @@ import * as Haptics from 'expo-haptics';
 
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
+import { ErrorState } from '@/components/error-state';
 import { useUser } from '@/src/contexts/UserContext';
 import { swipeService } from '@/src/services/swipeService';
 import { Restaurant } from '@/src/types';
@@ -36,6 +37,7 @@ export default function SwipeScreen() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [swiping, setSwiping] = useState(false);
 
   // Animation values for current card
@@ -63,16 +65,15 @@ export default function SwipeScreen() {
 
     try {
       setLoading(true);
-      console.log('Loading restaurants for user:', user.id);
+      setError(null);
       const data = await swipeService.getUnswipedRestaurants(user.id, {
         limit: 20,
       });
-      console.log('Loaded restaurants:', data.length);
       setRestaurants(data);
       setCurrentIndex(0);
-    } catch (error: any) {
-      console.error('Error loading restaurants:', error);
-      Alert.alert('Error', error.message || 'Failed to load restaurants. Please try again.');
+    } catch (err: any) {
+      console.error('Error loading restaurants:', err);
+      setError(err.message || 'Failed to load restaurants.');
       setRestaurants([]);
     } finally {
       setLoading(false);
@@ -139,20 +140,20 @@ export default function SwipeScreen() {
         const direction = swipeDistance > 0 ? 'right' : 'left';
         const exitX = direction === 'right' ? SCREEN_WIDTH + 100 : -SCREEN_WIDTH - 100;
 
-        translateX.value = withSpring(exitX);
+        translateX.value = withSpring(exitX, { damping: 20 });
         translateY.value = withSpring(0);
         rotate.value = withSpring(direction === 'right' ? 20 : -20);
-        opacity.value = withTiming(0, { duration: 200 }, () => {
+        opacity.value = withTiming(0, { duration: 300 }, () => {
+          // Reset values on the UI thread AFTER the exit animation completes
+          translateX.value = 0;
+          translateY.value = 0;
+          rotate.value = 0;
+          opacity.value = 1;
+          nextCardScale.value = 0.95;
+          nextCardOpacity.value = 0.5;
+
           runOnJS(handleSwipe)(direction);
         });
-
-        // Reset for next card
-        translateX.value = 0;
-        translateY.value = 0;
-        rotate.value = 0;
-        opacity.value = 1;
-        nextCardScale.value = 0.95;
-        nextCardOpacity.value = 0.5;
       } else {
         // Spring back to center
         translateX.value = withSpring(0);
@@ -274,6 +275,16 @@ export default function SwipeScreen() {
           You need to be logged in to swipe on restaurants.
         </ThemedText>
       </ThemedView>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <ErrorState
+        message={error}
+        onRetry={loadRestaurants}
+      />
     );
   }
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase, Restaurant } from '../lib/supabase';
+import { supabase } from '@/src/services/supabase';
+import { Restaurant } from '@/src/types';
 
 export function useRestaurants() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);

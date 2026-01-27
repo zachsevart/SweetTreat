@@ -22,14 +22,10 @@ export default function IndexScreen() {
       // Signed in
       if (isNewUser || !profile) {
         // New user or no profile, redirect to profile creation
-        if (!inAuthGroup) {
-          router.replace('/auth/create-profile');
-        }
+        router.replace('/auth/create-profile');
       } else {
         // Has profile, redirect to home
-        if (inAuthGroup) {
-          router.replace('/(tabs)/home');
-        }
+        router.replace('/(tabs)/home');
       }
     }
   }, [session, profile, loading, isNewUser, segments]);

@@ -1,86 +1,111 @@
-import { Platform, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { router } from 'expo-router';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { useUser } from '@/src/contexts/UserContext';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: 'pink', dark: 'pink' }}
-      headerImage={<></>}
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/home.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const { profile } = useUser();
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+  const greeting = profile?.username ? `Hey, ${profile.username}` : 'Hey there';
+
+  return (
+    <ThemedView style={styles.container}>
+      <View style={styles.header}>
+        <ThemedText type="title" style={styles.greeting}>
+          {greeting}
         </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+        <ThemedText style={styles.subtitle}>
+          What are you craving?
         </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </View>
+
+      <View style={styles.actions}>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => router.navigate('/(tabs)/swipe')}
+          activeOpacity={0.8}
+        >
+          <ThemedText style={styles.cardEmoji}>🍰</ThemedText>
+          <ThemedText style={styles.cardTitle}>Discover</ThemedText>
+          <ThemedText style={styles.cardDescription}>
+            Swipe through dessert spots near you
+          </ThemedText>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => router.navigate('/(tabs)/map')}
+          activeOpacity={0.8}
+        >
+          <ThemedText style={styles.cardEmoji}>🗺️</ThemedText>
+          <ThemedText style={styles.cardTitle}>Explore</ThemedText>
+          <ThemedText style={styles.cardDescription}>
+            Browse dessert places on the map
+          </ThemedText>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => router.navigate('/(tabs)/savedPlaces')}
+          activeOpacity={0.8}
+        >
+          <ThemedText style={styles.cardEmoji}>💾</ThemedText>
+          <ThemedText style={styles.cardTitle}>Saved</ThemedText>
+          <ThemedText style={styles.cardDescription}>
+            View your saved sweet spots
+          </ThemedText>
+        </TouchableOpacity>
+      </View>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: 'pink',
+    paddingHorizontal: 24,
+    paddingTop: 80,
   },
-  stepContainer: {
-    gap: 8,
+  header: {
+    marginBottom: 40,
+  },
+  greeting: {
+    fontSize: 34,
+    fontWeight: 'bold',
     marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 18,
+    opacity: 0.7,
+  },
+  actions: {
+    gap: 16,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cardEmoji: {
+    fontSize: 32,
+    marginBottom: 8,
+  },
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  cardDescription: {
+    fontSize: 14,
+    opacity: 0.6,
   },
 });

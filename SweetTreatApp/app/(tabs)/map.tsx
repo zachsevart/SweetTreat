@@ -125,10 +125,11 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import MapView, { Marker, MapPressEvent, LatLng } from 'react-native-maps';
 import { useRestaurants } from '../../hooks/use-restaurants';
+import { ErrorState } from '@/components/error-state';
 
 export default function MapScreen() {
   const [marker, setMarker] = useState<LatLng | null>(null);
-  const { restaurants, loading, error } = useRestaurants();
+  const { restaurants, loading, error, refetch } = useRestaurants();
 
   const initialRegion = {
     latitude: 47.6061,
@@ -152,10 +153,10 @@ export default function MapScreen() {
 
   if (error) {
     return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Error: {error}</Text>
-        <Text style={styles.errorHint}>Check your Supabase connection</Text>
-      </View>
+      <ErrorState
+        message={`Failed to load dessert spots. ${error}`}
+        onRetry={refetch}
+      />
     );
   }
 
