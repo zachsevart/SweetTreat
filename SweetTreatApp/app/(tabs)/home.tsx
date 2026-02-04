@@ -49,7 +49,7 @@ export default function HomeScreen() {
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => router.navigate('/(tabs)/savedPlaces')}
+          onPress={() => router.navigate('/saved-places' as any)}
           activeOpacity={0.8}
         >
           <ThemedText style={styles.cardEmoji}>💾</ThemedText>

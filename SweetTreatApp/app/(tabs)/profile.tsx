@@ -39,6 +39,7 @@ export default function ProfileScreen() {
   const accountCreated = profile?.created_at
     ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
     : 'N/A';
+  
 
   return (
     <ParallaxScrollView
@@ -101,6 +102,14 @@ export default function ProfileScreen() {
           <ThemedText style={styles.statLabel}>Visited</ThemedText>
         </ThemedView>
       </ThemedView>
+
+      <ThemedView style={styles.savedPlacesButton}>
+        <TouchableOpacity onPress={() => router.push('/saved-places' as any)}>
+          <ThemedText>Saved Places</ThemedText>
+        </TouchableOpacity>
+      </ThemedView>
+
+      
 
       <Collapsible title="Preferences">
         <ThemedView style={styles.preferenceItem}>
@@ -224,4 +233,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
   },
+  savedPlacesButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  },
+
+
 });

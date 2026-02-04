@@ -18,6 +18,7 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
 
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
@@ -235,6 +236,16 @@ export default function SwipeScreen() {
               <ThemedText style={styles.price}>{restaurant.price_range}</ThemedText>
             )}
           </View>
+
+          {!isNext && (
+            <TouchableOpacity
+              style={styles.detailsButton}
+              onPress={() => router.push(`/restaurant/${restaurant.id}`)}
+              activeOpacity={0.7}
+            >
+              <ThemedText style={styles.detailsButtonText}>View Details</ThemedText>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Swipe indicators */}
@@ -433,6 +444,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     opacity: 0.7,
+  },
+  detailsButton: {
+    marginTop: 12,
+    backgroundColor: '#000',
+    paddingVertical: 10,
+    borderRadius: 20,
+    alignItems: 'center',
+  },
+  detailsButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   swipeIndicator: {
     position: 'absolute',

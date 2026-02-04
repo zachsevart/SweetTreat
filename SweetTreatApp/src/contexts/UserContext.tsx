@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
-import { authService } from '@/src/services/authService';
 import { supabase } from '@/src/services/supabase';
+import { authService } from '@/src/services/authService';
 import { Profile } from '@/src/types';
 
 interface UserContextType {
@@ -61,26 +61,52 @@ export function UserProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    // Get initial session
-    authService.getSession().then((session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id).finally(() => setLoading(false));
+    // Validate session server-side on startup. Unlike getSession() which
+    // returns the cached token from AsyncStorage (possibly expired),
+    // getUser() makes a network call that forces a token refresh if needed.
+    supabase.auth.getUser().then(({ data: { user: validatedUser } }) => {
+      if (validatedUser) {
+        // Token is valid (or was refreshed successfully).
+        // Now read the refreshed session from the client.
+        supabase.auth.getSession().then(({ data: { session: freshSession } }) => {
+          setSession(freshSession);
+          setUser(validatedUser);
+          fetchProfile(validatedUser.id).finally(() => setLoading(false));
+        });
       } else {
+        // No valid session — clear state and go to login
+        setSession(null);
+        setUser(null);
+        setProfile(null);
         setLoading(false);
       }
+    }).catch(() => {
+      // Network error on startup — clear state so the user can re-login
+      setSession(null);
+      setUser(null);
+      setProfile(null);
+      setLoading(false);
     });
 
-    // Listen for auth changes
-    const { subscription } = authService.onAuthStateChange(async (session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await fetchProfile(session.user.id);
-      } else {
+    // Listen for auth changes, but distinguish event types
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setSession(null);
+        setUser(null);
         setProfile(null);
         setIsNewUser(false);
+        return;
+      }
+
+      // TOKEN_REFRESHED, SIGNED_IN, USER_UPDATED — update session state
+      if (session?.user) {
+        setSession(session);
+        setUser(session.user);
+
+        // Only fetch profile on sign-in, not on every token refresh
+        if (event === 'SIGNED_IN') {
+          await fetchProfile(session.user.id);
+        }
       }
     });
 
